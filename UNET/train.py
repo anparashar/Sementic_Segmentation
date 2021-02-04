@@ -1,10 +1,12 @@
 import torch
 import albumentations as A
-from albumentations.pytorch import ToTensorV2
+from albumentations.pytorch import ToTensorV2, ToTensor
 from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 from model import UNET
+import pdb
+
 
 from utils import(
     load_checkpoint,
@@ -35,9 +37,14 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
     loop = tqdm(loader)
 
     for batch_idx, (data, targets) in enumerate(loop):
+        '''
+        data shape : (8, 3, 160, 240)
+        targets shape : (8, 160, 240)  # gray scale이라서 채널이 없음을 인지
+        '''
         data = data.to(device)
-        targets = targets.float().unsqueeze(1).to(device)  # add channel dimension
 
+        targets = targets.float().unsqueeze(1).to(device)  # add channel dimension
+        #pdb.set_trace()
         # forward
         with torch.cuda.amp.autocast():
             predictions = model(data)
